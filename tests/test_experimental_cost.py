@@ -112,7 +112,9 @@ class ExperimentalCostTests(unittest.TestCase):
                     solver.evaluate({}, [entries[0]])
 
     def test_cli_and_protocol_expressions_are_opt_in_and_record_model(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        output = Path(__file__).resolve().parents[1] / "output" / "tests"
+        output.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=output) as tmp:
             cost_path = str(Path(tmp) / 'cost.json')
             run = subprocess.run([sys.executable, '-B', str(ROOT/'akari_human_solver.py'),
                 '--puzzlink', 'akari/2/2/0i', '--cost-model', 'overlap-experimental',

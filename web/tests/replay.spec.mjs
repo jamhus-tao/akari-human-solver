@@ -5,7 +5,7 @@ const root=path.resolve(import.meta.dirname,'../..');
 async function open(page){await page.goto('/web/?replay=daily-648-proof');await expect(page.locator('#puzzle-meta')).toContainText('No. 648');}
 test('replays branches, fast components and all 26 steps without browser errors',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await open(page);
- await page.screenshot({path:'screenshots/initial-desktop.png',fullPage:true});
+ await page.screenshot({path:path.join(root,'output/screenshots/initial-desktop.png'),fullPage:true});
  await page.getByRole('button',{name:'Step 6, brain cost 4',exact:true}).click();
  await expect(page.locator('#center-list .center-id')).toHaveText(['1','2']);
  await page.locator('[data-phase="branch"]').click();await expect(page.locator('#branch-verdict')).toContainText('Compatible');
@@ -13,7 +13,7 @@ test('replays branches, fast components and all 26 steps without browser errors'
  await expect(page.locator('#branch-list button').first()).toHaveAttribute('data-status','compatible');
  await expect(page.locator('#board [data-cell="(2,6)"]')).toHaveAttribute('aria-label','(2,6) Lamp');
  await expect(page.locator('#board [data-cell="(1,8)"]')).toHaveAttribute('aria-label','(1,8) Blank');
- await page.screenshot({path:'screenshots/step6-hypothesis.png',fullPage:true});
+ await page.screenshot({path:path.join(root,'output/screenshots/step6-hypothesis.png'),fullPage:true});
  await page.locator('[data-phase="conclusion"]').click();await expect(page.locator('#state-pill')).toContainText('not committed');
  await page.getByRole('button',{name:'Step 7, fast mark',exact:true}).click();
  await expect(page.locator('#center-list .center-id')).toHaveText(['0','0','0']);
@@ -52,7 +52,7 @@ test('mobile layout, controls, keyboard and play/pause',async({page})=>{
  await page.locator('#timeline button[data-index="1"]').click();await expect(page.locator('#step-counter')).toContainText('01');
  await page.locator('#next').click();await expect(page.locator('#step-counter')).toContainText('02');
  await page.locator('#play').click();await expect(page.locator('#play')).toHaveAttribute('aria-label','Pause playback');await page.locator('#play').click();
- await page.screenshot({path:'screenshots/mobile-step2.png',fullPage:true});
+ await page.screenshot({path:path.join(root,'output/screenshots/mobile-step2.png'),fullPage:true});
  await page.locator('#board [data-cell="(1,6)"]').click();await expect(page.locator('#cell-inspector')).toContainText('(1,6)');
 });
 test('schema errors cannot replace valid loaded replay and malicious strings stay text',async({page})=>{
@@ -81,7 +81,7 @@ test('catalog switches same puzzle solutions and actions never fabricate proof c
  await page.locator('#next').click();await expect(page.locator('#board [data-cell="(1,1)"]')).toHaveAttribute('aria-label','(1,1) Lamp');
  await page.locator('#next').click();await expect(page.locator('#board [data-cell="(1,1)"]')).toHaveAttribute('aria-label','(1,1) Blank');await expect(page.locator('#action-list')).toContainText('Remove');
  await page.locator('#next').click();await expect(page.locator('#progress-label')).toContainText('4 lit');
- await page.screenshot({path:'screenshots/generic-action-replay.png',fullPage:true});
+ await page.screenshot({path:path.join(root,'output/screenshots/generic-action-replay.png'),fullPage:true});
  await page.locator('#replay-select').selectOption('daily-648-proof');await expect(page.locator('#puzzle-meta')).toContainText('No. 648');await page.locator('#next').click();await expect(page.locator('[data-phase="branch"]')).toBeEnabled();
  expect(errors).toEqual([]);
 });
@@ -133,7 +133,7 @@ test('error frame is terminal, banner remains while navigating and export exclud
  await expect(page.locator('#timeline .error-frame')).toHaveCount(1);await expect(page.locator('#next')).toBeDisabled();
  await page.locator('#failure-back').click();await expect(page.locator('#step-counter')).toHaveText('1 / 2');await expect(page.locator('#validation-banner')).toBeVisible();expect(await page.locator('#validation-banner').evaluate(e=>getComputedStyle(e).position)).toBe('sticky');
  const downloadPromise=page.waitForEvent('download');await page.locator('#export-actions').click();const download=await downloadPromise;const exported=JSON.parse(fs.readFileSync(await download.path()));expect(exported.steps.length).toBe(1);expect(exported.steps[0].marks['(1,2)']).toBeUndefined();
- await page.locator('#show-failure').click();await page.screenshot({path:'screenshots/error-frame.png',fullPage:true});
+ await page.locator('#show-failure').click();await page.screenshot({path:path.join(root,'output/screenshots/error-frame.png'),fullPage:true});
 });
 test('malformed initial frame immediately opens error details without crashing board',async({page})=>{
  await open(page);await page.locator('#import-open').click();const r={format:'akari-replay',version:2,puzzle:{grid:[[-1]]},steps:[{marks:{'(99,1)':'Lamp'}}]};
@@ -154,7 +154,7 @@ test('remaining clue, original corner badge, exact satisfied face and negative e
  await expect(page.locator('#board [data-layer="numbers"] .clue-remaining')).toContainText(['-1']);
  await expect(page.locator('#board [data-layer="conflicts"] [data-render-cell="(2,2)"] .conflict-label')).toHaveText('!');
  await expect(page.locator('#board [data-layer="conflicts"] .clue-remaining')).toHaveCount(0);
- await page.screenshot({path:'screenshots/remaining-clue-error.png',fullPage:true});
+ await page.screenshot({path:path.join(root,'output/screenshots/remaining-clue-error.png'),fullPage:true});
  await expect(page.locator('#original-board')).toHaveAttribute('href',/akari\/3\/3\/gggg2gggg$/);
 });
 test('hypothetical clue remaining resets across branch, before and after phases',async({page})=>{
@@ -272,7 +272,7 @@ test('completed replay has a closing page after the final proof, with navigation
  await page.locator('#start').click();await expect(page.locator('[data-phase="conclusion"]')).toHaveAttribute('aria-pressed','true');
  await page.setViewportSize({width:390,height:844});await page.locator('#timeline .finish-frame').click();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
- await page.screenshot({path:'/tmp/akari-finish-mobile.png',fullPage:true});
+ await page.screenshot({path:path.join(root,'output/screenshots/finish-mobile.png'),fullPage:true});
  expect(errors).toEqual([]);
 });
 

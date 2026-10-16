@@ -29,3 +29,6 @@ htmlcov/
 .env.*
 !.env.example
 .DS_Store
+
+# Local temporary investigation and test artifacts.
+/output/

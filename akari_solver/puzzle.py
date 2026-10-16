@@ -1,6 +1,4 @@
-"""Puzzle parsing and optional Daily Akari acquisition."""
-import json
-import urllib.request
+"""Offline puzzle geometry parsing."""
 
 def parse_puzzlink(url: str) -> list[list[int]]:
     import re
@@ -37,12 +35,3 @@ def parse_puzzlink(url: str) -> list[list[int]]:
         if pos > rows * cols + padding:
             raise ValueError("encoded run exceeds board size")
     return grid
-
-
-def fetch_today(tz_offset: int = -480) -> dict:
-    req = urllib.request.Request(
-        "https://dailyakari.com/dailypuzzle",
-        headers={"Accept": "application/json", "X-Tz-Offset": str(tz_offset), "User-Agent": "akari-human-solver/1.0"},
-    )
-    with urllib.request.urlopen(req, timeout=20) as response:
-        return json.load(response)

@@ -4,16 +4,16 @@ import json
 from pathlib import Path
 
 from .solver import AkariHumanSolver
-from .puzzle import parse_puzzlink, fetch_today
+from .puzzle import parse_puzzlink
 from .board import illuminated, render
 from .protocol import make_report
 from .cost_models import COST_FUNCTIONS
 
 def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--today", action="store_true", help="fetch Daily Akari's current puzzle")
-    ap.add_argument("--puzzlink", help="puzz.link Akari URL")
-    ap.add_argument("--json", help="Daily Akari JSON object or path to it")
+    ap = argparse.ArgumentParser(description="Solve offline. Download first with python -m akari_solver.download.")
+    source = ap.add_mutually_exclusive_group(required=True)
+    source.add_argument("--puzzlink", help="puzz.link Akari URL (parsed locally, not fetched)")
+    source.add_argument("--json", help="local Daily Akari JSON file or inline JSON object")
     ap.add_argument("--max-combinations", type=int, default=200_000)
     ap.add_argument("--max-branches", type=int, default=200_000)
     ap.add_argument("--cost-model", choices=tuple(COST_FUNCTIONS),
@@ -26,10 +26,7 @@ def main() -> int:
     for output in (args.output, args.steps_output, args.cost_output):
         if output:
             Path(output).parent.mkdir(parents=True, exist_ok=True)
-    if args.today or not (args.puzzlink or args.json):
-        data = fetch_today()
-        url = data["puzzlink"]
-    elif args.json:
+    if args.json:
         raw = args.json if args.json.lstrip().startswith("{") else Path(args.json).read_text(encoding="utf-8")
         data = json.loads(raw)
         if isinstance(data, str):

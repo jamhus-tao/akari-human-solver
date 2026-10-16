@@ -44,7 +44,8 @@ Validation checks feasibility and forced actions, not minimum cost or uniqueness
 Modules live in `web/src/`, UI markup/styles in `web/`, and tests in `web/tests/`.
 Run `npm --prefix web ci`, then `npm --prefix web test` and
 `npm --prefix web run test:browser`. Chrome is required by the browser config.
-Tests generate ignored screenshots and result directories.
+Tests generate ignored `output/screenshots/` and `output/playwright-results/`
+directories at the project root.
 
 Before deploying runtime changes, run `python3 tools/version_assets.py`; this
 stamps the complete module graph, including the Worker, with one release ID.

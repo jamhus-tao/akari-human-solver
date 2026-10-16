@@ -10,6 +10,7 @@ requires-python = ">=3.10"
 
 [project.scripts]
 akari-solve = "akari_solver.cli:main"
+akari-download = "akari_solver.download:main"
 
 [tool.setuptools.packages.find]
 include = ["akari_solver*"]

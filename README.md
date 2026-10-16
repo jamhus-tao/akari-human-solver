@@ -22,56 +22,58 @@ python3 -B tools/serve.py --port 8765
 ```
 
 `python3 -B akari_human_solver.py ...` remains a compatible CLI entry point.
-`python3 -m pip install -e .` optionally installs the `akari-solve` command.
+`python3 -m pip install -e .` optionally installs `akari-solve` and `akari-download`.
 Use `python3 -m akari_solver --help` for all CLI options. Reproducible tests use
 the saved puzzle geometry in `data/`.
 
-## Fetching puzzles
+## Download, then solve
 
-Fetching is implemented in [`akari_solver/puzzle.py`](akari_solver/puzzle.py),
-through the public `fetch_today()` function. There is no separate crawler CLI.
-
-```sh
-# Fetch today's puzzle and solve it; --output saves a proof, not the raw puzzle.
-python3 -B -m akari_solver --today --output results/today-proof.json
-```
-
-To fetch and save only the original puzzle JSON, without running the solver,
-execute this from the project root:
+Downloading and solving are separate commands. Only the downloader accesses
+Daily Akari; the solver requires `--json` or `--puzzlink` and stays offline.
 
 ```sh
-python3 -B - <<'PY'
-import json
-from pathlib import Path
-from akari_solver import fetch_today
+# 1. Download only the original puzzle JSON (today is the default).
+python3 -B -m akari_solver.download --output results/puzzles/today.json
 
-puzzle = fetch_today()
-output = Path("results/puzzles") / f"daily-{puzzle['dateKey']}.json"
-output.parent.mkdir(parents=True, exist_ok=True)
-output.write_text(json.dumps(puzzle, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-print(output)
-PY
+# 2. Solve that saved puzzle, without another network request.
+python3 -B -m akari_solver --json results/puzzles/today.json \
+  --output results/today-proof.json
 ```
 
-Use the printed path with `--json` to solve the saved puzzle later, for example
-`python3 -B -m akari_solver --json results/puzzles/daily-2026-10-16.json`.
-The filename uses the response's `dateKey`; confirm `dailyNumber` in the saved
-JSON when identifying a puzzle. Files under `results/` stay excluded from Git.
+The downloader accepts **one** selector, or none for today:
 
-Current behavior and limits:
+```sh
+python3 -B -m akari_solver.download --today --output results/puzzles/today.json
+python3 -B -m akari_solver.download --date 2026-10-16 --output results/puzzles/2026-10-16.json
+python3 -B -m akari_solver.download --number 649 --output results/puzzles/649.json
+```
 
-- Sends one JSON request to `https://dailyakari.com/dailypuzzle`; it does not
-  recognize screenshots or crawl the archive.
-- Defaults to `fetch_today(tz_offset=-480)`, sending `X-Tz-Offset: -480` for
-  UTC+8. The Python API accepts another offset; the CLI has no timezone option.
-- Only the current daily puzzle is supported. There are no `--date`, `--number`
-  or `--puzzle-id` selectors. `--json` reads local JSON (or inline JSON), not a URL.
-- Uses a 20-second request timeout, with no automatic retries. Network, HTTP or
-  invalid-JSON errors are reported; they do not trigger a fallback to a saved puzzle.
-- Omitting all puzzle-source options also fetches today. Use `--json` or
-  `--puzzlink` explicitly for offline/reproducible input, and choose one source.
-- `tools/prepare_data.py` generates local demos from saved puzzle inputs; it does
-  not fetch new puzzles or install a scheduled refresh job.
+`--today`, `--date`, and `--number` are mutually exclusive. The number is the
+visible daily sequence number, not the site's internal `puzzleId`. Dates use
+`YYYY-MM-DD`; the archive starts at number 1 on 2025-01-06. Date selection maps
+to the archive number and verifies both returned fields before saving.
+Unavailable, future or non-playable archive puzzles fail without substituting
+today's puzzle. The site controls archive availability.
+
+`--tz-offset MINUTES` sets UTC minus local time; the default `-480` is UTC+8.
+Downloads use a 20-second request timeout and no automatic retries. Exit code
+`1` means a download/network/response failure; `2` means invalid CLI arguments.
+A failed fetch or invalid response leaves an existing destination untouched.
+A successful download writes the original puzzle JSON, retaining site metadata.
+
+Implementation: [`akari_solver/download.py`](akari_solver/download.py).
+Python callers can import `fetch_today`, `fetch_date`, or `fetch_number` from
+that module. `from akari_solver import fetch_today` remains a compatibility API.
+After `pip install -e .`, equivalent commands are `akari-download` and
+`akari-solve`. Their `--output` arguments save **puzzle JSON** and **proof JSON**,
+respectively. The old combined solver `--today` option has been removed; use the
+two commands above. `--puzzlink` is parsed locally and does not fetch a URL.
+
+To view a proof without running your own service, open the hosted replay page,
+choose **Import files**, select the proof as **Solver output**, leave **Original
+board** empty, and click **Open replay**. Import stays in the browser.
+`tools/prepare_data.py` generates demos from saved inputs; it does not download
+new puzzles or install a scheduled refresh job.
 
 ## Experimental cost
 
@@ -131,3 +133,8 @@ The public Python API is `from akari_solver import AkariHumanSolver, parse_puzzl
 Keep generated reports, credentials, caches and dependencies out of commits.
 The example catalog points to local generated files; run preparation after a
 fresh checkout before opening the viewer.
+
+Temporary downloads, logs, screenshots and test artifacts belong under `output/`,
+which is Git-ignored. Python tests use `output/tests/`; browser tests write to
+`output/playwright-results/` and `output/screenshots/`. Keep durable puzzle/proof
+files in their explicit output destinations, separate from temporary artifacts.

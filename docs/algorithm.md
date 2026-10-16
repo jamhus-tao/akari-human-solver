@@ -4,8 +4,9 @@
 
 `akari_solver/solver.py` owns local domains, pooled enumeration, the shared heap
 search and batch commits. `board.py` derives illumination and display state;
-`puzzle.py` parses geometry and optionally downloads a daily puzzle. `cli.py`
-handles input/output. `protocol.py` serializes proofs. `exact_verifier.py` is an
+`puzzle.py` parses geometry offline. `download.py` independently fetches today
+or an archive puzzle and saves its original JSON; `cli.py` handles offline solve
+input/output. Source selectors are exclusive and solve never implicitly fetches. `protocol.py` serializes proofs. `exact_verifier.py` is an
 independent safety checker. `cost_models.py` contains interchangeable scorers.
 
 The public package exposes `AkariHumanSolver`, `Center`, `BrainStep`,
