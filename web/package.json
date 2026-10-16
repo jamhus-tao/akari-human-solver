@@ -1,0 +1,13 @@
+{
+  "name": "akari-reasoning-replay",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -B ../tools/serve.py --port 8765",
+    "test": "node --test tests/*.test.mjs",
+    "test:browser": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
+}

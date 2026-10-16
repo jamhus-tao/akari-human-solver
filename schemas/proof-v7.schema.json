@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Akari strict-local proof v7",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "puzzle", "steps"],
+  "properties": {
+    "schema_version": {"const": 7},
+    "puzzle": {
+      "type": "object", "additionalProperties": false,
+      "oneOf": [{"required": ["grid"]}, {"required": ["puzzlink"]}],
+      "properties": {
+        "grid": {"type": "array", "minItems": 1, "maxItems": 2500, "items": {"type": "array", "minItems": 1, "maxItems": 2500, "items": {"enum": [-2,-1,0,1,2,3,4]}}},
+        "puzzlink": {"type": "string"},
+        "title": {"type": "string"}, "author": {"type": "string"}, "dateKey": {"type": "string"},
+        "source": {"type": "string"}, "license": {"type": "string"}, "socialUrl": {"type": "string"},
+        "dailyNumber": {"type": "integer"}, "puzzleId": {"type": "integer"}, "difficulty": {"type": "integer"}
+      }
+    },
+    "initial_marks": {"$ref": "#/$defs/actions"},
+    "steps": {
+      "type": "array", "maxItems": 10000,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["actions", "proofs"],
+        "properties": {
+          "actions": {"$ref": "#/$defs/actions"},
+          "proofs": {"type": "array", "minItems": 1, "maxItems": 2500, "uniqueItems": true, "items": {"type": "array", "minItems": 1, "maxItems": 100, "uniqueItems": true, "items": {"$ref": "#/$defs/coordinate"}}},
+          "note": {"type": "string", "pattern": "\\S"}
+        }
+      }
+    },
+    "stop": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "reason"],
+      "properties": {"kind": {"enum": ["stuck", "search_limit", "partial"]}, "reason": {"type": "string", "pattern": "\\S"}}
+    }
+  },
+  "$defs": {
+    "coordinate": {"type": "string", "pattern": "^\\([1-9][0-9]*,[1-9][0-9]*\\)$"},
+    "actions": {"type": "object", "minProperties": 1, "propertyNames": {"$ref": "#/$defs/coordinate"}, "additionalProperties": {"enum": ["Lamp", "Mark"]}}
+  },
+  "$comment": "Runtime additionally checks rectangle/2500 total cells, geometry, center activity, unordered duplicate center sets, proof reconstruction, action equality, feasibility, necessity, completion and budgets."
+}

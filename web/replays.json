@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "defaultReplay": "daily-649-proof",
+  "replays": [
+    {
+      "id": "daily-649-proof",
+      "puzzleTitle": "Daily Akari No. 649",
+      "title": "Standard cost (product)",
+      "solution": "../results/daily-2026-10-16.json"
+    },
+    {
+      "id": "daily-649-overlap",
+      "puzzleTitle": "Daily Akari No. 649",
+      "title": "Experimental cost (Overlap Contribution)",
+      "solution": "../results/experiments/daily-649-overlap.json"
+    },
+    {
+      "id": "daily-648-proof",
+      "puzzleTitle": "Daily Akari No. 648",
+      "title": "Strict local-center proof",
+      "solution": "../results/daily-2026-10-15.json"
+    },
+    {
+      "id": "small-manual",
+      "puzzleTitle": "2 x 2 example",
+      "title": "Manual diagonal lights",
+      "puzzle": "./examples/small-puzzle.json",
+      "solution": "./examples/manual.json"
+    },
+    {
+      "id": "small-alternative",
+      "puzzleTitle": "2 x 2 example",
+      "title": "Alternative with correction",
+      "puzzle": "./examples/small-puzzle.json",
+      "solution": "./examples/alternative.json"
+    },
+    {
+      "id": "small-final",
+      "puzzleTitle": "2 x 2 example",
+      "title": "Final lamp coordinates only",
+      "solution": "./examples/final.json"
+    }
+  ]
+}

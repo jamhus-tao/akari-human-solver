@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "akari-human-solver"
+version = "0.1.0"
+description = "Strict local Akari inference and proof replay"
+requires-python = ">=3.10"
+
+[project.scripts]
+akari-solve = "akari_solver.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["akari_solver*"]

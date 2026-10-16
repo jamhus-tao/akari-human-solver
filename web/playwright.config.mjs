@@ -1,0 +1,2 @@
+import {defineConfig} from '@playwright/test';
+export default defineConfig({testDir:'./tests',testMatch:'*.spec.mjs',timeout:30000,workers:1,use:{channel:'chrome',headless:true,baseURL:'http://127.0.0.1:8765',viewport:{width:1400,height:1050}},webServer:{command:'python3 -B ../tools/serve.py --port 8765',url:'http://127.0.0.1:8765/web/',reuseExistingServer:true,timeout:15000}});

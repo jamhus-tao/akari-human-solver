@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<title>Daily Akari / Reasoning replay</title>
+<link rel="stylesheet" href="style.css?v=754b0258aff5fda6">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="./" aria-label="Akari replay home"><span class="smile" aria-hidden="true"></span><span>Daily Akari <span class="brand-divider">/</span> <small>Replay</small></span></a>
+  <nav><a id="original-board" class="quiet external-link" target="_blank" rel="noopener noreferrer" hidden>Original board ↗</a><a id="reference-image-link" class="quiet external-link" target="_blank" rel="noopener noreferrer" hidden>Reference image ↗</a><button id="help-open" class="quiet">How to replay</button><button id="import-open" class="outlined">Import files <span aria-hidden="true">&#8599;</span></button></nav>
+</header>
+<main>
+ <div class="heading"><div><p class="eyebrow">LIGHT UP. UNDERSTAND WHY.</p><h1>One mark. Every possibility.</h1><p class="muted" id="puzzle-meta">Loading local puzzle&hellip;</p></div><div class="dataset-tag"><span class="live-dot"></span> LOCAL REPLAY <span class="muted">/</span> <span id="format-label">LOADING</span></div></div>
+ <div class="catalog-bar"><label for="replay-select">Puzzle / solution</label><select id="replay-select" disabled aria-label="Puzzle and solution"><option>Loading catalog...</option></select><button id="catalog-reload" class="quiet">Reload catalog</button><button id="export-actions" class="outlined" disabled>Export actions</button><span id="catalog-status" class="micro" role="status"></span></div>
+ <div id="error" role="alert" hidden></div>
+
+ <div class="workspace">
+  <section class="play-panel" aria-label="Puzzle replay">
+   <div class="board-top"><div><span class="eyebrow" id="board-kicker">ORIGINAL PUZZLE</span><h2 id="board-title">Before the first mark</h2></div><span class="state-pill" id="state-pill">Initial state</span></div>
+   <div class="phase-tabs" role="group" aria-label="Step phase">
+    <button data-phase="before">1 <span>Before</span></button><button data-phase="branch">2 <span>Explore</span></button><button data-phase="conclusion">3 <span>Common facts</span></button><button data-phase="after">4 <span>After</span></button>
+   </div>
+   <div class="board-wrap"><svg id="board" role="group" aria-label="Akari board"></svg></div>
+   <div class="board-tools"><button id="clear-cell" class="quiet">Clear selection</button></div>
+   <div class="legend"><span><i class="dot lamp-key"></i> Lamp</span><span><i class="mark-key">&#215;</i> Mark</span><span><i class="lit-key"></i> Lit</span><span><i class="ring-key"></i> Center</span><span><i class="new-key"></i> Proven</span></div>
+   <div class="cell-inspector" id="cell-inspector" aria-live="polite">Click a cell to inspect its state and visible lamp positions.</div>
+   <div class="transport"><button id="first" class="icon-btn" aria-label="Go to initial board">&#8676;</button><button id="prev" class="icon-btn" aria-label="Previous step">&#8592;</button><button id="play" class="play-btn" aria-label="Play steps">&#9654;</button><button id="next" class="icon-btn" aria-label="Next step">&#8594;</button><span id="step-counter">0 / 0</span><select id="speed" aria-label="Playback speed"><option value="2400">Slow</option><option value="1400" selected>Normal</option><option value="650">Fast</option></select></div>
+   <input id="scrubber" type="range" min="0" max="26" value="0" aria-label="Replay step">
+   <div class="transport-caption"><span id="progress-label">No marks committed</span><span>&larr; &rarr; steps &middot; Space to play</span></div>
+  </section>
+  <aside class="proof-panel" aria-label="Reasoning details">
+   <div class="proof-heading"><div><p class="eyebrow">THE REASONING</p><h2 id="proof-title">Start with a blank board.</h2></div><div class="cost-block"><span id="cost-value">&mdash;</span><small>BRAIN COST</small></div></div>
+   <p class="proof-intro" id="proof-intro">Replay verified marks without hiding the assumptions behind them.</p>
+   <div id="initial-content"><div class="intro-symbol">&#9786;</div><h3>Not just the answer.</h3><p>Move through each step. Try its local candidates, inspect conflicts, and see which facts survive every compatible possibility.</p><button id="start" class="primary">Start replay <span>&#8594;</span></button></div>
+   <div id="finish-content" hidden><div class="intro-symbol" aria-hidden="true">&#9786;</div><h3>All lit. All done.</h3><p id="finish-summary"></p><p>Every Number is satisfied, and no lamps shine on one another.</p><button id="restart" class="primary">Replay from the beginning <span>&#8634;</span></button></div>
+   <div id="action-content" hidden><h3>Action playback</h3><p id="action-note" class="proof-intro"></p><p class="micro">No enumeration proof was supplied for this step. These actions are a recorded sequence, not certified forced deductions. Explore and Common facts are unavailable.</p><div class="section-heading"><h3>Recorded changes</h3><span id="action-count" class="micro"></span></div><div id="action-list"></div></div>
+   <div id="failure-content" hidden>
+    <p id="failure-source" class="eyebrow"></p>
+    <h3 id="failure-reason" role="alert"></h3>
+    <p id="failure-preview-note" class="micro"></p>
+    <div class="section-heading"><h3>Attempted changes (not committed)</h3><span id="failure-action-count" class="micro"></span></div>
+    <div id="failure-actions"></div>
+    <button id="failure-back" class="outlined">Compare with last valid frame</button>
+    <details><summary>Rejected input / diagnostic details</summary><pre id="failure-input"></pre></details>
+   </div>
+   <p id="step-note" class="proof-intro" hidden></p>
+   <div id="step-content" hidden>
+    <section id="component-section" hidden><div class="section-heading"><h3>Independent results</h3><button id="all-components" class="text-btn" aria-live="polite">Show each</button></div><p class="micro">Same before-state. No result uses another result's marks.</p><div id="component-list"></div></section>
+    <section><div class="section-heading"><h3>Enumeration centers</h3><span class="micro" id="cost-formula"></span></div><div id="center-list"></div></section>
+    <section id="branch-section"><div class="section-heading"><h3>Candidate combinations</h3><span id="branch-position" class="micro"></span></div><p id="candidate-summary" class="micro"></p><div id="candidate-controls"></div><div class="branch-nav"><button id="branch-prev" class="outlined" aria-label="Previous combination">&#8592;</button><span id="branch-verdict">Choose Explore to preview a hypothesis.</span><button id="branch-next" class="outlined" aria-label="Next combination">&#8594;</button></div><p class="micro" id="branch-reason"></p><div id="branch-list"></div><div class="branch-pagination"><button id="proof-prev" class="text-btn">Previous candidates</button><span id="proof-page" class="micro"></span><button id="proof-next" class="text-btn">More candidates</button></div></section>
+    <section id="result-section"><div class="section-heading"><h3 id="marks-heading">Marks to commit</h3><span id="mark-count" class="micro"></span></div><div id="mark-list"></div><p class="micro" id="dedup-note"></p></section>
+    <details id="audit-details"><summary>Proof &amp; verification details</summary><p class="micro" id="audit-summary"></p><pre id="audit-json"></pre></details>
+   </div>
+   <div class="rule-note"><span>&#9432;</span><p id="rule-note">Only the selected centers and direct lamp rays are used. A new constraint requires a new center. The exact solver checks marks; it never supplies this reasoning.</p></div>
+  </aside>
+ </div>
+ <section class="timeline-section"><div class="section-heading"><div><p class="eyebrow">THE WHOLE JOURNEY</p><h2>Step by step.</h2></div><div class="timeline-legend"><span class="fast-label">&#9889; Fast mark</span><span>Number = brain cost</span></div></div><div id="timeline"></div><p id="terminal-note" class="micro"></p></section>
+
+</main>
+<footer><span>Light up, make happy.</span><span>Independent reasoning viewer &middot; Not the official Daily Akari game &middot; All imports stay in this browser</span></footer>
+<dialog id="import-dialog"><form id="import-form"><div class="section-heading"><h2>Bring your own puzzle.</h2><button type="button" id="import-close" class="icon-btn" aria-label="Close import">&#215;</button></div><p class="muted">A solver report, an original board, and every step in between.</p><label class="file-field">1. Solver output <strong>Required &middot; proof or action JSON</strong><input id="report-file" type="file" accept=".json,application/json"></label><label class="file-field">2. Original board <strong>Optional if layout is embedded</strong><input id="puzzle-file" type="file" accept=".json,.txt,.png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"><small>JSON grid / Daily Akari data, .txt board or puzz.link URL. PNG/JPEG/WebP opens separately through Reference image; no OCR or automatic rotation.</small></label><p id="import-error" role="alert"></p><div class="dialog-actions"><button type="button" id="load-example" class="outlined">Load configured default</button><button type="submit" class="primary">Open replay &#8594;</button></div></form></dialog>
+<dialog id="help-dialog"><div class="section-heading"><h2>Read the reasoning.</h2><button id="help-close" class="icon-btn" aria-label="Close help">&#215;</button></div><ol><li><strong>Before:</strong> only the actual marks already committed.</li><li><strong>Explore:</strong> select a pooled candidate combination. Green outlined lamps are hypothetical; red outlines show direct conflicts. Nothing is committed.</li><li><strong>Common facts:</strong> green outlines show the verified actions to submit. Existing marks remain visible until the actions are committed.</li><li><strong>After:</strong> the actual deduplicated Lamp/Mark actions and their automatic light.</li></ol><p>Generic action replay only enables Before and After. It can display notes, corrections and final-coordinate layouts, but does not invent proofs. Select a configured puzzle/solution from the catalog, or import your own files.</p><p>A fast mark contains at least two independent proofs sharing one before-state. Selecting another component always resets its assumptions; it never chains the components.</p><p>Click a center to highlight its legal enumeration scope. Click a cell to inspect it; use arrow keys to navigate. Colors have accompanying labels and symbols.</p><p class="micro">The viewer independently checks legal continuations and strict proof claims. An invalid or unverified suffix is excluded from playback. It does not check minimum brain cost.</p></dialog>
+<script defer src="src/bootstrap.js?v=754b0258aff5fda6"></script>
+</body></html>

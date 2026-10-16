@@ -1,0 +1,31 @@
+# Generated solutions, histories and experimental diagnostics (never commit).
+/results/
+/tests/fixtures/*.json
+/data/old-step2-start.json
+/data/joint-x-regression.json
+/web/examples/manual.json
+/web/examples/alternative.json
+/web/examples/final.json
+
+# Dependencies, caches, local references and test artifacts.
+__pycache__/
+.pycache/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+node_modules/
+test-results/
+playwright-report/
+screenshots/
+web/reference/
+.coverage
+htmlcov/
+*.log
+*.tmp
+*.bak
+*.tar.gz
+.env
+.env.*
+!.env.example
+.DS_Store
