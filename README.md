@@ -23,8 +23,55 @@ python3 -B tools/serve.py --port 8765
 
 `python3 -B akari_human_solver.py ...` remains a compatible CLI entry point.
 `python3 -m pip install -e .` optionally installs the `akari-solve` command.
-Use `python3 -m akari_solver --help` for all CLI options. `--today` fetches a new
-puzzle; reproducible tests use the saved puzzle geometry in `data/`.
+Use `python3 -m akari_solver --help` for all CLI options. Reproducible tests use
+the saved puzzle geometry in `data/`.
+
+## Fetching puzzles
+
+Fetching is implemented in [`akari_solver/puzzle.py`](akari_solver/puzzle.py),
+through the public `fetch_today()` function. There is no separate crawler CLI.
+
+```sh
+# Fetch today's puzzle and solve it; --output saves a proof, not the raw puzzle.
+python3 -B -m akari_solver --today --output results/today-proof.json
+```
+
+To fetch and save only the original puzzle JSON, without running the solver,
+execute this from the project root:
+
+```sh
+python3 -B - <<'PY'
+import json
+from pathlib import Path
+from akari_solver import fetch_today
+
+puzzle = fetch_today()
+output = Path("results/puzzles") / f"daily-{puzzle['dateKey']}.json"
+output.parent.mkdir(parents=True, exist_ok=True)
+output.write_text(json.dumps(puzzle, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+print(output)
+PY
+```
+
+Use the printed path with `--json` to solve the saved puzzle later, for example
+`python3 -B -m akari_solver --json results/puzzles/daily-2026-10-16.json`.
+The filename uses the response's `dateKey`; confirm `dailyNumber` in the saved
+JSON when identifying a puzzle. Files under `results/` stay excluded from Git.
+
+Current behavior and limits:
+
+- Sends one JSON request to `https://dailyakari.com/dailypuzzle`; it does not
+  recognize screenshots or crawl the archive.
+- Defaults to `fetch_today(tz_offset=-480)`, sending `X-Tz-Offset: -480` for
+  UTC+8. The Python API accepts another offset; the CLI has no timezone option.
+- Only the current daily puzzle is supported. There are no `--date`, `--number`
+  or `--puzzle-id` selectors. `--json` reads local JSON (or inline JSON), not a URL.
+- Uses a 20-second request timeout, with no automatic retries. Network, HTTP or
+  invalid-JSON errors are reported; they do not trigger a fallback to a saved puzzle.
+- Omitting all puzzle-source options also fetches today. Use `--json` or
+  `--puzzlink` explicitly for offline/reproducible input, and choose one source.
+- `tools/prepare_data.py` generates local demos from saved puzzle inputs; it does
+  not fetch new puzzles or install a scheduled refresh job.
 
 ## Experimental cost
 
